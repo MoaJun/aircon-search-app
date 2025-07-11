@@ -116,7 +116,8 @@ export default function Home() {
       if (serviceType) {
         queryParams.append('service_type', serviceType);
       }
-      const response = await fetch(`http://localhost:8000/api/repairers?${queryParams.toString()}`);
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'; // 開発環境向けにlocalhostも残す
+      const response = await fetch(`${backendUrl}/api/repairers?${queryParams.toString()}`);
       
       if (!response.ok) {
         // HTTPエラーの場合
