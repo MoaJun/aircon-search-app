@@ -79,19 +79,13 @@ async def get_repairers(zip_code: str, service_type: Optional[str] = None):
         return {"repairers": dummy_repairers}
 
     # --- 新しいPlaces APIのリクエスト形式 ---
-    # より自然な検索クエリを生成して精度を向上させる
-    base_query = f"{zip_code} エアコン"
-    service_keyword = ""
-
+    # 検索精度向上のため、より具体的な複合キーワードを生成する
     if service_type:
-        if service_type == "クリーニング":
-            service_keyword = "クリーニング"
-        elif service_type == "修理":
-            service_keyword = "修理"
-        elif service_type == "設置":
-            service_keyword = "設置"
-    
-    query = f"{base_query} {service_keyword}".strip()
+        # サービスタイプが指定されている場合は、複合キーワードを作成
+        query = f"{zip_code} エアコン{service_type}"
+    else:
+        # デフォルトは「修理」
+        query = f"{zip_code} エアコン修理"
     
     payload = {
         'textQuery': query,
