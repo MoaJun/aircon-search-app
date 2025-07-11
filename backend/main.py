@@ -23,7 +23,8 @@ app.add_middleware(
 )
 
 # ★★★ APIキーの設定 ★★★
-GOOGLE_PLACES_API_KEY = "AIzaSyCtVs9jF-iWUQIZxGXUi_BHi8-252s7uXY"
+# Vercelの環境変数からAPIキーを読み込む
+GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
 # 新しいPlaces APIのエンドポイント
 PLACES_API_URL = "https://places.googleapis.com/v1/places:searchText"
