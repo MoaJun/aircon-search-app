@@ -25,6 +25,9 @@ app.add_middleware(
 # ★★★ APIキーの設定 ★★★
 # Vercelの環境変数からAPIキーを読み込む
 GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+GOOGLE_GEOCODING_API_KEY = os.getenv("GOOGLE_GEOCODING_API_KEY")
+
+GEOCODING_API_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 
 # 新しいPlaces APIのエンドポイント
 PLACES_API_URL = "https://places.googleapis.com/v1/places:searchText"
@@ -70,6 +73,47 @@ dummy_repairers = [
 
 # --- APIエンドポイント --------------------------------------------------------->
 
+async def get_prefecture_and_city_from_zip_code(zip_code: str) -> Optional[str]:
+    """
+    郵便番号から都道府県と市区町村を取得する
+    """
+    if not GOOGLE_GEOCODING_API_KEY:
+        print("GEOCODING_API_KEY is not set.")
+        return None
+
+    params = {
+        "address": f"〒{zip_code}",
+        "key": GOOGLE_GEOCODING_API_KEY,
+        "language": "ja"
+    }
+
+    try:
+        response = requests.get(GEOCODING_API_URL, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if data["status"] == "OK" and data["results"]:
+            address_components = data["results"][0]["address_components"]
+            prefecture = ""
+            city = ""
+            for component in address_components:
+                if "administrative_area_level_1" in component["types"]:
+                    prefecture = component["long_name"]
+                if "locality" in component["types"] or "sublocality" in component["types"]:
+                    city = component["long_name"]
+            
+            if prefecture and city:
+                return f"{prefecture}{city}"
+            elif prefecture: # 市区町村が取得できない場合でも都道府県は返す
+                return prefecture
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Geocoding API connection failed: {e}")
+        return None
+    except Exception as e:
+        print(f"Geocoding API internal error: {e}")
+        return None
+
 @app.get("/api/repairers", response_model=dict)
 async def get_repairers(zip_code: str, service_type: Optional[str] = None):
     """
@@ -78,9 +122,23 @@ async def get_repairers(zip_code: str, service_type: Optional[str] = None):
     if not GOOGLE_PLACES_API_KEY:
         return {"repairers": dummy_repairers}
 
-    # --- 新しいPlaces APIのリクエスト形式 ---
-    # 【デバッグ目的】問題を切り分けるため、クエリを固定値に設定
-    query = "東京都のエアコン修理"
+    # 郵便番号から地域情報を取得
+    location_name = await get_prefecture_and_city_from_zip_code(zip_code)
+    if not location_name:
+        # 地域情報が取得できない場合はエラーを返すか、デフォルトの動作をする
+        return {"error": "郵便番号から地域情報を取得できませんでした。"}
+
+    # サービスタイプに応じた検索クエリを生成
+    service_keyword = "エアコン修理" # Default service
+    if service_type:
+        if service_type == "クリーニング":
+            service_keyword = "エアコンクリーニング"
+        elif service_type == "修理":
+            service_keyword = "エアコン修理"
+        elif service_type == "設置":
+            service_keyword = "エアコン設置"
+    
+    query = f"{location_name} {service_keyword}"
     
     payload = {
         'textQuery': query,
