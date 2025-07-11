@@ -79,8 +79,17 @@ async def get_repairers(zip_code: str, service_type: Optional[str] = None):
         return {"repairers": dummy_repairers}
 
     # --- 新しいPlaces APIのリクエスト形式 ---
-    # 【デバッグ目的】問題を切り分けるため、クエリを固定値に設定
-    query = "東京都のエアコン修理"
+    # 検索クエリを「サービス内容 郵便番号」の形式に変更し、精度を向上させる
+    service_name = "エアコン修理" # Default service
+    if service_type:
+        if service_type == "クリーニング":
+            service_name = "エアコンクリーニング"
+        elif service_type == "修理":
+            service_name = "エアコン修理"
+        elif service_type == "設置":
+            service_name = "エアコン設置"
+    
+    query = f"{service_name} {zip_code}"
     
     payload = {
         'textQuery': query,
