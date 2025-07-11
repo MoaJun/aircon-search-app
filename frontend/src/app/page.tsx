@@ -137,8 +137,8 @@ export default function Home() {
         [cacheKey]: newRepairers,
       }));
 
-    } catch (e: any) {
-      setError(`検索中にエラーが発生しました: ${e.message}`);
+    } catch (e: unknown) {
+      setError(`検索中にエラーが発生しました: ${e instanceof Error ? e.message : '不明なエラー'}`);
     } finally {
       setLoading(false);
     }
