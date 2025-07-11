@@ -13,7 +13,10 @@ app = FastAPI()
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Temporarily allow all origins
+    allow_origins=[
+        "http://localhost:3000",
+        "https://aircon-search-frontend1.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
