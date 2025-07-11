@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://maps.googleapis.com; img-src 'self' data: https://maps.gstatic.com https://*.googleapis.com; connect-src 'self' https://maps.googleapis.com https://*.googleapis.com; frame-src 'self' https://maps.googleapis.com;`,
+            value: `default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://maps.googleapis.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://maps.googleapis.com https://fonts.googleapis.com; img-src 'self' data: https://maps.gstatic.com https://*.googleapis.com; connect-src 'self' https://maps.googleapis.com https://*.googleapis.com https://aircon-search-backend-tmjs-projects-5256c7ce.vercel.app; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://maps.googleapis.com;`,
           },
         ],
       },
