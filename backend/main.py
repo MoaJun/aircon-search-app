@@ -13,7 +13,7 @@ app = FastAPI()
 # CORS設定
 origins = [
     "http://localhost:3000",
-    "https://aircon-search-frontend-kbtovxawq-tmjs-projects-5256c7ce.vercel.app"
+    "https://aircon-search-frontend-ccylt538o-tmjs-projects-5256c7ce.vercel.app"
 ]
 app.add_middleware(
     CORSMiddleware,
