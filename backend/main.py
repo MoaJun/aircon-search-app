@@ -12,9 +12,16 @@ app = FastAPI()
 
 # CORS設定
 origins = [
-    "http://localhost:3000",
-    "https://aircon-search-frontend-gxtn32j2b-tmjs-projects-5256c7ce.vercel.app"
+    "http://localhost:3000", # For local development
 ]
+
+# Dynamically add Vercel frontend URL if available
+vercel_url = os.environ.get("VERCEL_URL")
+if vercel_url:
+    # VERCEL_URL is typically like "your-project-git-branch.vercel.app"
+    # We need to construct the full HTTPS URL
+    frontend_vercel_origin = f"https://{vercel_url}"
+    origins.append(frontend_vercel_origin)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
